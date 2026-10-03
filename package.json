@@ -1,0 +1,20 @@
+{
+  "name": "roi-arkan-mg",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ROI ARKAN-MG WhatsApp Multi-Device Bot",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "express": "^5.1.0",
+    "pino": "^9.6.0"
+  }
+}
