@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROI ARKAN-MG</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">♛ ROI ARKAN<span>-MG</span></div>
+
+    <button class="nav active" data-page="dashboard">
+      🏠 Dashboard
+    </button>
+
+    <button class="nav" data-page="commands">
+      ☷ Commands
+    </button>
+
+    <button class="nav" data-page="settings">
+      ⚙️ Settings
+    </button>
+
+    <button class="nav" data-page="connect">
+      📱 WhatsApp
+    </button>
+  </aside>
+
+  <main>
+
+    <header>
+      <div>
+        <small>WHATSAPP MULTI-DEVICE BOT</small>
+        <h1>ROI ARKAN-MG</h1>
+      </div>
+
+      <div class="status">
+        <i></i> OFFLINE
+      </div>
+    </header>
+
+    <section id="dashboard" class="page">
+
+      <div class="hero">
+
+        <div>
+          <small>CONTROL PANEL</small>
+
+          <h2>ROI ARKAN-MG</h2>
+
+          <p>
+            Yon WhatsApp bot pwisan ak AI,
+            download, group tools, owner tools,
+            search ak anpil lòt kòmand.
+          </p>
+
+          <button class="primary" data-open="connect">
+            Konekte WhatsApp
+          </button>
+        </div>
+
+        <div class="crown">♛</div>
+
+      </div>
+
+      <div class="cards">
+
+        <div class="card">
+          <span>COMMANDS</span>
+          <strong id="commandCount">0</strong>
+        </div>
+
+        <div class="card">
+          <span>CATEGORIES</span>
+          <strong id="categoryCount">0</strong>
+        </div>
+
+        <div class="card">
+          <span>PREFIX</span>
+          <strong id="prefixDisplay">.</strong>
+        </div>
+
+        <div class="card">
+          <span>MODE</span>
+          <strong id="modeDisplay">PUBLIC</strong>
+        </div>
+
+      </div>
+
+      <div class="panel">
+        <h3>⚡ Command Preview</h3>
+        <div id="preview" class="command-grid"></div>
+      </div>
+
+    </section>
+
+    <section id="commands" class="page hidden">
+
+      <div class="toolbar">
+
+        <div>
+          <small>COMMAND LIBRARY</small>
+          <h2>Tout Commands</h2>
+        </div>
+
+        <input
+          id="search"
+          type="text"
+          placeholder="Chèche yon kòmand..."
+        >
+
+      </div>
+
+      <div id="commandList"></div>
+
+    </section>
+
+    <section id="settings" class="page hidden">
+
+      <div class="panel settings">
+
+        <small>BOT SETTINGS</small>
+
+        <h2>Konfigirasyon</h2>
+
+        <label>
+          Bot Name
+          <input id="botName" value="ROI ARKAN-MG">
+        </label>
+
+        <label>
+          Owner Name
+          <input id="ownerName" value="ROI ARKAN">
+        </label>
+
+        <label>
+          Prefix
+          <input id="prefixInput" value=".">
+        </label>
+
+        <label>
+          Mode
+
+          <select id="modeInput">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+
+        </label>
+
+        <button class="primary" id="saveSettings">
+          💾 Save Settings
+        </button>
+
+        <p id="saved"></p>
+
+      </div>
+
+    </section>
+
+    <section id="connect" class="page hidden">
+
+      <div class="panel">
+
+        <small>WHATSAPP CONNECTION</small>
+
+        <h2>Konekte WhatsApp</h2>
+
+        <p>
+          Dashboard sa a pral konekte ak backend
+          WhatsApp bot la lè server la pare.
+        </p>
+
+        <div class="notice">
+          STATUS:
+          <strong>BACKEND NOT CONNECTED</strong>
+        </div>
+
+        <p class="muted">
+          QR Code oswa Pairing Code la ap parèt
+          isit la lè backend bot la konekte.
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+
+</body>
+    </html>
