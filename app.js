@@ -1,424 +1,282 @@
-const commands = [
-  // AI MENU
-  { name: "ai", category: "AI" },
-  { name: "bot", category: "AI" },
-  { name: "gpt", category: "AI" },
-  { name: "gpt3", category: "AI" },
-  { name: "gpt35turbo", category: "AI" },
-  { name: "gpt4", category: "AI" },
-  { name: "gpt4turbo", category: "AI" },
-  { name: "gpt4o", category: "AI" },
-  { name: "gpt4omini", category: "AI" },
+import express from "express";
+import makeWASocket, {
+  DisconnectReason,
+  fetchLatestBaileysVersion,
+  useMultiFileAuthState
+} from "@whiskeysockets/baileys";
+import P from "pino";
+import fs from "fs/promises";
+import path from "path";
 
-  // DOWNLOAD
-  { name: "capcut", category: "Download" },
-  { name: "apk", category: "Download" },
-  { name: "fb", category: "Download" },
-  { name: "igdl", category: "Download" },
-  { name: "igdl2", category: "Download" },
-  { name: "igdl3", category: "Download" },
-  { name: "mediafire", category: "Download" },
-  { name: "dlnpm", category: "Download" },
-  { name: "megadl", category: "Download" },
-  { name: "ttmp3", category: "Download" },
-  { name: "igmp3", category: "Download" },
-  { name: "tiktok", category: "Download" },
-  { name: "tiktok2", category: "Download" },
-  { name: "tiktok3", category: "Download" },
-  { name: "ytpost", category: "Download" },
-  { name: "download", category: "Download" },
+const app = express();
+const PORT = process.env.PORT || 3000;
+const SESSIONS_DIR = path.join(process.cwd(), "sessions");
 
-  // SEARCH / MEDIA
-  { name: "tsticker", category: "Media" },
-  { name: "tiktoksearch", category: "Search" },
-  { name: "surah", category: "Search" },
-  { name: "tts", category: "Media" },
-  { name: "gitclone", category: "Tools" },
-  { name: "play", category: "Media" },
-  { name: "video", category: "Media" },
-  { name: "song", category: "Media" },
-  { name: "drama", category: "Media" },
-  { name: "cartoon", category: "Media" },
-  { name: "movie", category: "Media" },
+const sessions = new Map();
+const pairingLocks = new Map();
 
-  // GROUP / AUTO
-  { name: "statuslike", category: "Auto" },
-  { name: "botdp", category: "Bot" },
-  { name: "welcome", category: "Group" },
-  { name: "goodbye", category: "Group" },
-  { name: "setwelcome", category: "Group" },
-  { name: "setgoodbye", category: "Group" },
-  { name: "autoread", category: "Auto" },
-  { name: "antilink", category: "Group" },
-  { name: "antistatus", category: "Auto" },
-  { name: "antidelete", category: "Group" },
-  { name: "recording", category: "Auto" },
-  { name: "statusview", category: "Auto" },
-  { name: "autoreact", category: "Auto" },
-  { name: "anticall", category: "Group" },
-  { name: "anticallmsg", category: "Group" },
-  { name: "adminaction", category: "Group" },
-  { name: "autotyping", category: "Auto" },
-  { name: "online", category: "Bot" },
+app.use(express.json());
+app.use(express.static(process.cwd()));
 
-  // BOT SETTINGS
-  { name: "mode", category: "Settings" },
-  { name: "prefix", category: "Settings" },
-  { name: "botname", category: "Settings" },
-  { name: "ownername", category: "Settings" },
-  { name: "ownerNumber", category: "Settings" },
-  { name: "description", category: "Settings" },
-  { name: "stickername", category: "Settings" },
-  { name: "delpath", category: "Settings" },
-  { name: "reactemojis", category: "Settings" },
-  { name: "owneremojis", category: "Settings" },
-  { name: "mentionreply", category: "Settings" },
-
-  // OWNER
-  { name: "vv3", category: "Owner" },
-  { name: "vv", category: "Owner" },
-  { name: "vv2", category: "Owner" },
-  { name: "delete", category: "Owner" },
-  { name: "forward", category: "Owner" },
-  { name: "leave", category: "Owner" },
-  { name: "hidetag", category: "Owner" },
-  { name: "ik", category: "Owner" },
-  { name: "block", category: "Owner" },
-  { name: "unblock", category: "Owner" },
-  { name: "pair", category: "Owner" },
-  { name: "follow", category: "Owner" },
-  { name: "follow2", category: "Owner" },
-  { name: "unfollow", category: "Owner" },
-  { name: "unfollow2", category: "Owner" },
-  { name: "status", category: "Owner" },
-  { name: "status2", category: "Owner" },
-  { name: "fullpp", category: "Owner" },
-
-  // SEARCH
-  { name: "define", category: "Search" },
-  { name: "google", category: "Search" },
-  { name: "image", category: "Search" },
-  { name: "weather", category: "Search" },
-  { name: "news", category: "Search" }
-];
-
-
-// ================================
-// ELEMENTS
-// ================================
-
-const commandCount = document.getElementById("commandCount");
-const categoryCount = document.getElementById("categoryCount");
-const prefixDisplay = document.getElementById("prefixDisplay");
-const modeDisplay = document.getElementById("modeDisplay");
-
-const commandList = document.getElementById("commandList");
-const preview = document.getElementById("preview");
-const search = document.getElementById("search");
-
-
-// ================================
-// DASHBOARD STATS
-// ================================
-
-const categories = [
-  ...new Set(commands.map(command => command.category))
-];
-
-commandCount.textContent = commands.length;
-categoryCount.textContent = categories.length;
-
-
-// ================================
-// COMMAND PREVIEW
-// ================================
-
-function renderPreview() {
-
-  preview.innerHTML = "";
-
-  commands.slice(0, 12).forEach(command => {
-
-    const item = document.createElement("div");
-
-    item.className = "command";
-
-    item.innerHTML = `
-      <b>.</b>${command.name}
-    `;
-
-    preview.appendChild(item);
-
-  });
-
+function cleanPhone(value) {
+  return String(value || "").replace(/\D/g, "");
 }
 
-renderPreview();
+function validPhone(phone) {
+  return /^\d{8,15}$/.test(phone);
+}
 
+function getText(message) {
+  return (
+    message?.conversation ||
+    message?.extendedTextMessage?.text ||
+    message?.imageMessage?.caption ||
+    message?.videoMessage?.caption ||
+    ""
+  ).trim();
+}
 
-// ================================
-// COMMAND LIST
-// ================================
+function menuText() {
+  return `╭━━━〔 🤖 ROI ARKAN-MG 〕━━━╮
 
-function renderCommands(list = commands) {
+┃ 📋 MENU PRINCIPAL
+┃
+┃ 1️⃣ .menu
+┃ 2️⃣ .ping
+┃ 3️⃣ .help
+┃
+┃ ⚡ Bot la aktif!
 
-  commandList.innerHTML = "";
+╰━━━━━━━━━━━━━━━━━━━━━━╯`;
+}
 
-  if (list.length === 0) {
+async function startSession(phone) {
+  await fs.mkdir(SESSIONS_DIR, { recursive: true });
 
-    commandList.innerHTML = `
-      <div class="panel">
-        <h3>Pa jwenn kòmand lan</h3>
-        <p class="muted">
-          Eseye yon lòt non oswa kategori.
-        </p>
-      </div>
-    `;
+  const authDir = path.join(SESSIONS_DIR, phone);
 
-    return;
-  }
+  const { state, saveCreds } =
+    await useMultiFileAuthState(authDir);
 
+  const { version } = await fetchLatestBaileysVersion();
 
-  const grouped = {};
-
-  list.forEach(command => {
-
-    if (!grouped[command.category]) {
-      grouped[command.category] = [];
-    }
-
-    grouped[command.category].push(command);
-
+  const sock = makeWASocket({
+    version,
+    auth: state,
+    printQRInTerminal: false,
+    logger: P({ level: "silent" })
   });
 
+  const session = {
+    phone,
+    sock,
+    state,
+    connected: false,
+    pairingCode: null
+  };
 
-  Object.keys(grouped).forEach(category => {
+  sessions.set(phone, session);
 
-    const section = document.createElement("div");
+  sock.ev.on("creds.update", saveCreds);
 
-    section.className = "panel";
+  sock.ev.on("connection.update", async (update) => {
+    const { connection, lastDisconnect } = update;
 
-    section.innerHTML = `
-      <h3>⚡ ${category}</h3>
-      <div class="command-grid"></div>
-    `;
+    if (connection === "open") {
+      session.connected = true;
+      session.pairingCode = null;
 
-    const grid = section.querySelector(".command-grid");
+      console.log(`✅ WhatsApp konekte: ${phone}`);
+    }
 
-    grouped[category].forEach(command => {
+    if (connection === "close") {
+      session.connected = false;
 
-      const item = document.createElement("div");
+      const code =
+        lastDisconnect?.error?.output?.statusCode;
 
-      item.className = "command";
+      if (code !== DisconnectReason.loggedOut) {
+        console.log(`🔄 Rekoneksyon pou ${phone}...`);
 
-      item.innerHTML = `
-        <b>.</b>${command.name}
-      `;
+        sessions.delete(phone);
 
-      grid.appendChild(item);
+        setTimeout(() => {
+          startSession(phone).catch(console.error);
+        }, 2000);
+      } else {
+        console.log(`🚪 WhatsApp dekonekte: ${phone}`);
+        sessions.delete(phone);
+      }
+    }
+  });
 
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    for (const msg of messages) {
+      if (!msg.message || msg.key.fromMe) continue;
+
+      const jid = msg.key.remoteJid;
+
+      if (!jid || jid === "status@broadcast") continue;
+
+      const text = getText(msg.message).toLowerCase();
+
+      try {
+        if (
+          text === ".menu" ||
+          text === "/menu" ||
+          text === "menu"
+        ) {
+          await sock.sendMessage(jid, {
+            text: menuText()
+          });
+        }
+
+        if (
+          text === ".ping" ||
+          text === "/ping"
+        ) {
+          await sock.sendMessage(jid, {
+            text: "🏓 Pong!\n\n🤖 ROI ARKAN-MG aktif."
+          });
+        }
+
+        if (
+          text === ".help" ||
+          text === "/help"
+        ) {
+          await sock.sendMessage(jid, {
+            text:
+              "🤖 KÒMAND DISPONIB:\n\n" +
+              "📋 .menu\n" +
+              "🏓 .ping\n" +
+              "❓ .help"
+          });
+        }
+      } catch (error) {
+        console.error("❌ Erè mesaj:", error);
+      }
+    }
+  });
+
+  return session;
+}
+
+async function getSession(phone) {
+  let session = sessions.get(phone);
+
+  if (session) {
+    return session;
+  }
+
+  return await startSession(phone);
+}
+
+app.post("/api/pair", async (req, res) => {
+  const phone = cleanPhone(req.body?.phone);
+
+  if (!validPhone(phone)) {
+    return res.status(400).json({
+      ok: false,
+      error:
+        "Mete nimewo a ak kòd peyi a, san +, espas oswa tirè."
+    });
+  }
+
+  if (pairingLocks.has(phone)) {
+    return res.status(409).json({
+      ok: false,
+      error:
+        "Gen yon koneksyon ki deja ap prepare. Tann kèk segond."
+    });
+  }
+
+  pairingLocks.set(phone, true);
+
+  try {
+    const session = await getSession(phone);
+
+    if (
+      session.connected ||
+      session.state.creds.registered
+    ) {
+      return res.json({
+        ok: true,
+        connected: true
+      });
+    }
+
+    await new Promise(resolve =>
+      setTimeout(resolve, 1000)
+    );
+
+    const code =
+      await session.sock.requestPairingCode(phone);
+
+    session.pairingCode = code;
+
+    console.log(
+      `🔐 Pairing Code pou ${phone}: ${code}`
+    );
+
+    return res.json({
+      ok: true,
+      connected: false,
+      code
     });
 
-    commandList.appendChild(section);
+  } catch (error) {
 
-  });
+    console.error("❌ Pairing error:", error);
 
-}
+    return res.status(500).json({
+      ok: false,
+      error:
+        "WhatsApp pa t kapab kreye kòd la. Eseye ankò."
+    });
 
-renderCommands();
-
-
-// ================================
-// SEARCH COMMANDS
-// ================================
-
-if (search) {
-
-  search.addEventListener("input", () => {
-
-    const query = search.value
-      .toLowerCase()
-      .trim();
-
-    const filtered = commands.filter(command =>
-      command.name.toLowerCase().includes(query) ||
-      command.category.toLowerCase().includes(query)
-    );
-
-    renderCommands(filtered);
-
-  });
-
-}
-
-
-// ================================
-// NAVIGATION
-// ================================
-
-const pages = document.querySelectorAll(".page");
-const navButtons = document.querySelectorAll(".nav");
-
-function showPage(pageName) {
-
-  pages.forEach(page => {
-    page.classList.add("hidden");
-  });
-
-  const selected = document.getElementById(pageName);
-
-  if (selected) {
-    selected.classList.remove("hidden");
+  } finally {
+    pairingLocks.delete(phone);
   }
-
-  navButtons.forEach(button => {
-
-    button.classList.remove("active");
-
-    if (button.dataset.page === pageName) {
-      button.classList.add("active");
-    }
-
-  });
-
-}
-
-
-navButtons.forEach(button => {
-
-  button.addEventListener("click", () => {
-
-    showPage(button.dataset.page);
-
-  });
-
 });
 
+app.get("/api/status", (req, res) => {
+  const phone = cleanPhone(req.query.phone);
 
-// ================================
-// CONNECT BUTTON
-// ================================
+  if (!validPhone(phone)) {
+    return res.status(400).json({
+      ok: false,
+      error: "Nimewo a pa valab."
+    });
+  }
 
-document.querySelectorAll("[data-open]").forEach(button => {
+  const session = sessions.get(phone);
 
-  button.addEventListener("click", () => {
-
-    showPage(button.dataset.open);
-
+  res.json({
+    ok: true,
+    connected: Boolean(session?.connected)
   });
-
 });
 
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    bot: "ROI ARKAN-MG"
+  });
+});
 
-// ================================
-// SETTINGS
-// ================================
-
-const botName = document.getElementById("botName");
-const ownerName = document.getElementById("ownerName");
-const prefixInput = document.getElementById("prefixInput");
-const modeInput = document.getElementById("modeInput");
-const saveSettings = document.getElementById("saveSettings");
-const saved = document.getElementById("saved");
-
-
-if (saveSettings) {
-
-  saveSettings.addEventListener("click", () => {
-
-    const prefix = prefixInput.value || ".";
-
-    prefixDisplay.textContent = prefix;
-
-    modeDisplay.textContent =
-      modeInput.value.toUpperCase();
-
-    localStorage.setItem(
-      "roiArkanBotName",
-      botName.value
-    );
-
-    localStorage.setItem(
-      "roiArkanOwner",
-      ownerName.value
-    );
-
-    localStorage.setItem(
-      "roiArkanPrefix",
-      prefix
-    );
-
-    localStorage.setItem(
-      "roiArkanMode",
-      modeInput.value
-    );
-
-
-    saved.textContent =
-      "✓ Settings saved successfully.";
-
-    setTimeout(() => {
-      saved.textContent = "";
-    }, 3000);
-
+async function boot() {
+  await fs.mkdir(SESSIONS_DIR, {
+    recursive: true
   });
 
+  app.listen(PORT, () => {
+    console.log(
+      `🚀 ROI ARKAN-MG ap kouri sou port ${PORT}`
+    );
+  });
 }
 
-
-// ================================
-// LOAD SETTINGS
-// ================================
-
-const savedBotName =
-  localStorage.getItem("roiArkanBotName");
-
-const savedOwner =
-  localStorage.getItem("roiArkanOwner");
-
-const savedPrefix =
-  localStorage.getItem("roiArkanPrefix");
-
-const savedMode =
-  localStorage.getItem("roiArkanMode");
-
-
-if (savedBotName && botName) {
-  botName.value = savedBotName;
-}
-
-if (savedOwner && ownerName) {
-  ownerName.value = savedOwner;
-}
-
-if (savedPrefix) {
-
-  prefixDisplay.textContent = savedPrefix;
-
-  if (prefixInput) {
-    prefixInput.value = savedPrefix;
-  }
-
-}
-
-if (savedMode) {
-
-  modeDisplay.textContent =
-    savedMode.toUpperCase();
-
-  if (modeInput) {
-    modeInput.value = savedMode;
-  }
-
-}
-
-
-// ================================
-// START
-// ================================
-
-showPage("dashboard");
-
-console.log(
-  "ROI ARKAN-MG dashboard loaded successfully."
-);
+boot().catch(error => {
+  console.error("❌ Server error:", error);
+  process.exit(1);
+});
