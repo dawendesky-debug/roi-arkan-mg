@@ -3,194 +3,377 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ROI ARKAN-MG</title>
+
+  <title>ROI ARKAN-MG | WhatsApp Bot</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <aside class="sidebar">
-    <div class="logo">♛ ROI ARKAN<span>-MG</span></div>
+  <main class="container">
 
-    <button class="nav active" data-page="dashboard">
-      🏠 Dashboard
-    </button>
+    <div class="card">
 
-    <button class="nav" data-page="commands">
-      ☷ Commands
-    </button>
-
-    <button class="nav" data-page="settings">
-      ⚙️ Settings
-    </button>
-
-    <button class="nav" data-page="connect">
-      📱 WhatsApp
-    </button>
-  </aside>
-
-  <main>
-
-    <header>
-      <div>
-        <small>WHATSAPP MULTI-DEVICE BOT</small>
-        <h1>ROI ARKAN-MG</h1>
+      <div class="logo">
+        🤖
       </div>
 
-      <div class="status">
-        <i></i> OFFLINE
-      </div>
-    </header>
+      <h1>ROI ARKAN-MG</h1>
 
-    <section id="dashboard" class="page">
+      <p class="title">
+        WhatsApp Multi-Device Bot
+      </p>
 
-      <div class="hero">
+      <p class="description">
+        Konekte WhatsApp ou ak bot la lè w sèvi ak yon
+        kòd koneksyon.
+      </p>
 
-        <div>
-          <small>CONTROL PANEL</small>
+      <form id="pairForm">
 
-          <h2>ROI ARKAN-MG</h2>
-
-          <p>
-            Yon WhatsApp bot pwisan ak AI,
-            download, group tools, owner tools,
-            search ak anpil lòt kòmand.
-          </p>
-
-          <button class="primary" data-open="connect">
-            Konekte WhatsApp
-          </button>
-        </div>
-
-        <div class="crown">♛</div>
-
-      </div>
-
-      <div class="cards">
-
-        <div class="card">
-          <span>COMMANDS</span>
-          <strong id="commandCount">0</strong>
-        </div>
-
-        <div class="card">
-          <span>CATEGORIES</span>
-          <strong id="categoryCount">0</strong>
-        </div>
-
-        <div class="card">
-          <span>PREFIX</span>
-          <strong id="prefixDisplay">.</strong>
-        </div>
-
-        <div class="card">
-          <span>MODE</span>
-          <strong id="modeDisplay">PUBLIC</strong>
-        </div>
-
-      </div>
-
-      <div class="panel">
-        <h3>⚡ Command Preview</h3>
-        <div id="preview" class="command-grid"></div>
-      </div>
-
-    </section>
-
-    <section id="commands" class="page hidden">
-
-      <div class="toolbar">
-
-        <div>
-          <small>COMMAND LIBRARY</small>
-          <h2>Tout Commands</h2>
-        </div>
+        <label for="phone">
+          📱 Nimewo WhatsApp
+        </label>
 
         <input
-          id="search"
-          type="text"
-          placeholder="Chèche yon kòmand..."
+          id="phone"
+          type="tel"
+          inputmode="numeric"
+          placeholder="509XXXXXXXX"
+          maxlength="15"
+          autocomplete="tel"
+          required
         >
 
-      </div>
+        <p class="hint">
+          Mete nimewo a ak kòd peyi a.
+          <br>
+          Egzanp: <strong>509XXXXXXXX</strong>
+          <br>
+          Pa mete +, espas oswa tirè.
+        </p>
 
-      <div id="commandList"></div>
-
-    </section>
-
-    <section id="settings" class="page hidden">
-
-      <div class="panel settings">
-
-        <small>BOT SETTINGS</small>
-
-        <h2>Konfigirasyon</h2>
-
-        <label>
-          Bot Name
-          <input id="botName" value="ROI ARKAN-MG">
-        </label>
-
-        <label>
-          Owner Name
-          <input id="ownerName" value="ROI ARKAN">
-        </label>
-
-        <label>
-          Prefix
-          <input id="prefixInput" value=".">
-        </label>
-
-        <label>
-          Mode
-
-          <select id="modeInput">
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-
-        </label>
-
-        <button class="primary" id="saveSettings">
-          💾 Save Settings
+        <button id="pairButton" type="submit">
+          🔐 Jwenn kòd koneksyon
         </button>
 
-        <p id="saved"></p>
+      </form>
 
+
+      <div id="loading" class="message hidden">
+        ⏳ Nap prepare kòd WhatsApp la...
       </div>
 
-    </section>
 
-    <section id="connect" class="page hidden">
+      <div id="codeBox" class="code-box hidden">
 
-      <div class="panel">
+        <p>🔐 Kòd koneksyon ou:</p>
 
-        <small>WHATSAPP CONNECTION</small>
-
-        <h2>Konekte WhatsApp</h2>
-
-        <p>
-          Dashboard sa a pral konekte ak backend
-          WhatsApp bot la lè server la pare.
-        </p>
-
-        <div class="notice">
-          STATUS:
-          <strong>BACKEND NOT CONNECTED</strong>
+        <div id="pairCode">
+          ----
         </div>
 
-        <p class="muted">
-          QR Code oswa Pairing Code la ap parèt
-          isit la lè backend bot la konekte.
+        <p class="small">
+          Pa pataje kòd sa a ak lòt moun.
         </p>
 
       </div>
 
-    </section>
+
+      <div id="instructions" class="instructions hidden">
+
+        <h2>📱 Kijan pou konekte</h2>
+
+        <ol>
+
+          <li>
+            Louvri <strong>WhatsApp</strong>
+          </li>
+
+          <li>
+            Ale nan
+            <strong>Aparèy konekte</strong>
+          </li>
+
+          <li>
+            Chwazi
+            <strong>Konekte yon aparèy</strong>
+          </li>
+
+          <li>
+            Chwazi opsyon
+            <strong>konekte ak nimewo telefòn</strong>
+          </li>
+
+          <li>
+            Mete kòd ki parèt sou sit la.
+          </li>
+
+        </ol>
+
+        <div id="connectionStatus" class="status">
+          ⏳ Nap tann WhatsApp konekte...
+        </div>
+
+      </div>
+
+
+      <div id="success" class="success hidden">
+
+        ✅ WhatsApp konekte avèk siksè!
+
+        <br><br>
+
+        🤖 Bot ROI ARKAN-MG pare.
+
+        <br><br>
+
+        Voye <strong>.menu</strong> sou WhatsApp
+        pou teste bot la.
+
+      </div>
+
+
+      <div id="error" class="error hidden"></div>
+
+    </div>
 
   </main>
 
-  <script src="app.js"></script>
+
+<script>
+
+const form = document.getElementById("pairForm");
+
+const phoneInput =
+  document.getElementById("phone");
+
+const pairButton =
+  document.getElementById("pairButton");
+
+const loading =
+  document.getElementById("loading");
+
+const codeBox =
+  document.getElementById("codeBox");
+
+const pairCode =
+  document.getElementById("pairCode");
+
+const instructions =
+  document.getElementById("instructions");
+
+const success =
+  document.getElementById("success");
+
+const errorBox =
+  document.getElementById("error");
+
+const connectionStatus =
+  document.getElementById("connectionStatus");
+
+
+function hide(element) {
+
+  element.classList.add("hidden");
+
+}
+
+
+function show(element) {
+
+  element.classList.remove("hidden");
+
+}
+
+
+form.addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  hide(codeBox);
+  hide(instructions);
+  hide(success);
+  hide(errorBox);
+
+  show(loading);
+
+  pairButton.disabled = true;
+
+  pairButton.textContent =
+    "⏳ Nap prepare...";
+
+
+  const phone =
+    phoneInput.value.replace(/\D/g, "");
+
+
+  if (!/^\d{8,15}$/.test(phone)) {
+
+    hide(loading);
+
+    show(errorBox);
+
+    errorBox.textContent =
+      "❌ Tanpri mete yon nimewo WhatsApp ki valab ak kòd peyi a.";
+
+    pairButton.disabled = false;
+
+    pairButton.textContent =
+      "🔐 Jwenn kòd koneksyon";
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch("/api/pair", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          phone: phone
+        })
+
+      });
+
+
+    const data =
+      await response.json();
+
+
+    hide(loading);
+
+
+    if (!response.ok || !data.ok) {
+
+      throw new Error(
+        data.error ||
+        "WhatsApp pa t kapab kreye kòd la."
+      );
+
+    }
+
+
+    if (data.connected) {
+
+      show(success);
+
+      pairButton.disabled = false;
+
+      pairButton.textContent =
+        "🔐 Jwenn kòd koneksyon";
+
+      return;
+
+    }
+
+
+    pairCode.textContent =
+      data.code || "----";
+
+
+    show(codeBox);
+
+    show(instructions);
+
+
+    connectionStatus.textContent =
+      "⏳ Nap tann ou antre kòd la nan WhatsApp...";
+
+
+    checkStatus(phone);
+
+
+  } catch (error) {
+
+    show(errorBox);
+
+    errorBox.textContent =
+      "❌ " + error.message;
+
+  }
+
+
+  pairButton.disabled = false;
+
+  pairButton.textContent =
+    "🔐 Jwenn kòd koneksyon";
+
+});
+
+
+async function checkStatus(phone) {
+
+  let attempts = 0;
+
+
+  const timer =
+    setInterval(async function() {
+
+      attempts++;
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/status?phone=" +
+            encodeURIComponent(phone)
+          );
+
+
+        const data =
+          await response.json();
+
+
+        if (data.connected) {
+
+          clearInterval(timer);
+
+
+          connectionStatus.textContent =
+            "✅ WhatsApp konekte!";
+
+
+          hide(codeBox);
+
+          show(success);
+
+        }
+
+      } catch (error) {
+
+        console.log(
+          "Status check error:",
+          error
+        );
+
+      }
+
+
+      if (attempts >= 90) {
+
+        clearInterval(timer);
+
+        connectionStatus.textContent =
+          "⚠️ Tan an fini. Si li poko konekte, mande yon nouvo kòd.";
+
+      }
+
+    }, 2000);
+
+}
+
+</script>
 
 </body>
-    </html>
+  </html>
